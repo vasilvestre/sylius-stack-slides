@@ -13,5 +13,5 @@ Contributeur Sylius, Symfony..
 <Tweet id="1510896428905906179" />
 
 <!--
-The last comment block of each slide will be treated as slide notes. It will be visible and editable in Presenter Mode along with the slide. [Read more in the docs](https://sli.dev/guide/syntax.html#notes)
+Je m'appelle Valentin Silvestre, je suis lead dev chez Akawaka depuis 2 ans, je fais du Symfony, du Sylius et pleins de trucs
 -->
