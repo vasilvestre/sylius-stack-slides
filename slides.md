@@ -112,7 +112,7 @@ layout: section
 level: 2
 ---
 
-# Pour des choses simples
+# 1. Twig extension
 
 twig extension (balise de test par exemple)
 
@@ -126,18 +126,50 @@ layout: section
 level: 2
 ---
 
-# Grid/Resource
+# 2. Grid/Resource
 
 Grid autonome mais + pratique avec Sylius/Resource (pas forcément lié a doctrine)
 https://nahan.fr/utilisation-de-gridbundle-hors-de-sylius
 
 <!--
-La Grid et le Resource permettent respectivement de créer une grille (de type crud admin ou bien front) et de générer des URLS, indiquer des formulaires, processer des formulaires, trouver des templates automatiquement...
+La Grid et le Resource permettent respectivement de créer une grille (de type crud admin ou bien front) et de générer des URLS, indiquer des formulaires, trouver des templates automatiquement...
 
 La Grid est totalement autonome et permet de gérer tout type de source de données, aussi bien via Doctrine que des fichiers CSV par exemple.
 
-La resource est autonome mais fonctionne clef en main avec le bundle de Resource et permet une génération complète de Crud très aisément.
+La grid est autonome mais fonctionne clef en main avec le bundle de Resource et permet une génération complète de Crud très aisément.
 -->
+
+---
+layout: default
+hideInToc: true
+---
+
+# Grid/Resource
+
+```php
+use Sylius\Resource\Metadata\AsResource;
+use Sylius\Resource\Metadata\BulkDelete;
+use Sylius\Resource\Metadata\Create;
+use Sylius\Resource\Metadata\Index;
+use Sylius\Resource\Metadata\Update;
+
+#[AsResource(
+    section: 'admin',
+    formType: UserType::class,
+    templatesDir: '@SyliusAdminUi/crud',
+    routePrefix: '/admin',
+    operations: [
+        new Create(),
+        new Update(formType: UserType::class),
+        new Index(grid: CollaboratorGrid::class),
+        new BulkDelete(),
+    ],
+    alias: 'app.collaborator',
+)]
+class MyEntity
+{
+}
+```
 
 ---
 layout: section
@@ -146,9 +178,11 @@ level: 2
 
 # Admin/BootstrapAdmin
 
+Login, menu, etc
+
 L'admin simple et via bootstrap
 
-bootstrap utilise le symfony/ux
+Bootstrap utilise le symfony/ux
 
 <!--
 L'admin est un composant qui crée un admin très léger/vide au avec la configuration de menu, un visuel, des templates de base à étendre.
@@ -161,7 +195,7 @@ layout: section
 level: 2
 ---
 
-# TwigHooks
+# 3. TwigHooks
 
 Au lieu des template event
 
@@ -268,11 +302,10 @@ hideInToc: true
 Motivation & différences
 
 Motivation :
-- le rendre autonome
 - pouvoir l'utiliser en dehors de Sylius
 
 Différences :
-- va plus loin grâce aux préfixes pour éviter les collisions et de rajouter des strings entre deux
+- va plus loin grâce aux préfixes pour éviter les collisions
 - fonctionne avec les components
 - composant standalone
 
