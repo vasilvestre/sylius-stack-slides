@@ -68,7 +68,7 @@ layout: section
 level: 2
 ---
 
-# ... réutilisables
+# Autonomes
 
 Non liés à Sylius (sylius/sylius) donc réutilisables
 
@@ -103,18 +103,22 @@ level: 1
 
 # Sylius/Stack est une collection d'outil
 
+- Help PHP developers be productive and enjoy their work
+
 <!--
 Maintenant que je vous ai donné le contexte du projet, Sylius/Stack se qualifie comme une collection d'outil
 -->
 
 ---
-layout: section
+layout: center
 level: 2
 ---
 
 # 1. Twig extension
 
-twig extension (balise de test par exemple)
+- SortBy
+- RouteExists
+- TestHtmlAttributeExtension
 
 <!--
 Il dispose de package très classiques comme des extensions Twig, ils permettent par exemple :
@@ -128,16 +132,45 @@ level: 2
 
 # 2. Grid/Resource
 
-Grid autonome mais + pratique avec Sylius/Resource (pas forcément lié a doctrine)
 https://nahan.fr/utilisation-de-gridbundle-hors-de-sylius
 
 <!--
-La Grid et le Resource permettent respectivement de créer une grille (de type crud admin ou bien front) et de générer des URLS, indiquer des formulaires, trouver des templates automatiquement...
+La Grid et le Resource permettent respectivement de créer une grille générique (de type crud admin ou bien front), filtrer, paginer...
 
 La Grid est totalement autonome et permet de gérer tout type de source de données, aussi bien via Doctrine que des fichiers CSV par exemple.
 
-La grid est autonome mais fonctionne clef en main avec le bundle de Resource et permet une génération complète de Crud très aisément.
+La Resource est autonome aussi mais est complexe à prendre en main sans la Grid. La ressource créer des controleurs agnostique comme fondation à votre site.
 -->
+
+---
+layout: default
+hideInToc: true
+---
+
+# Grid/Resource
+
+```php
+use Sylius\Resource\Metadata\AsResource;
+use Sylius\Resource\Metadata\BulkDelete;
+use Sylius\Resource\Metadata\Create;
+use Sylius\Resource\Metadata\Index;
+use Sylius\Resource\Metadata\Update;
+
+#[AsResource(
+    section: 'admin',
+    formType: UserType::class,
+    templatesDir: '@SyliusAdminUi/crud',
+    operations: [
+        new Create(),
+        new Update(),
+        new Index(),
+        new BulkDelete(),
+    ]
+)]
+class MyEntity
+{
+}
+```
 
 ---
 layout: default
@@ -160,7 +193,7 @@ use Sylius\Resource\Metadata\Update;
     routePrefix: '/admin',
     operations: [
         new Create(),
-        new Update(formType: UserType::class),
+        new Update(formType: UpdateUserType::class),
         new Index(grid: CollaboratorGrid::class),
         new BulkDelete(),
     ],
@@ -176,13 +209,7 @@ layout: section
 level: 2
 ---
 
-# Admin/BootstrapAdmin
-
-Login, menu, etc
-
-L'admin simple et via bootstrap
-
-Bootstrap utilise le symfony/ux
+# 3. Admin/BootstrapAdmin
 
 <!--
 L'admin est un composant qui crée un admin très léger/vide au avec la configuration de menu, un visuel, des templates de base à étendre.
@@ -192,12 +219,67 @@ Pour BootstrapAdmin, la solution est la même mais avec bootstrap déjà en plac
 
 ---
 layout: section
+hideInToc: true
+---
+
+# Admin
+
+<img src="/simple_admin.png" alt="Empty/blank admin" />
+
+<!--
+C'est pas terrible hein ?
+
+La debug bar nous apprend qu'on a un login, un admin, des templates, des twig hooks mais rien de s'affiche.
+Voyons comment résoudre ça !
+-->
+
+---
+layout: center
+hideInToc: true
+---
+
+# Bootstrap admin
+
+```bash
+composer require sylius/bootstrap-admin-ui
+```
+
+---
+layout: section
+hideInToc: true
+---
+
+# Bootstrap admin
+
+<img src="/admin_login.png" alt="Simple admin login" />
+
+<!--
+Bootstrap admin est en fait un "thème" de l'admin qui configure les templates, blocks etc..
+
+A noter que le login ici ne fait rien, il n'existe que comme base pour construire votre login.
+-->
+
+---
+layout: section
+hideInToc: true
+---
+
+# Bootstrap admin
+
+<img src="/admin.png" alt="Simple admin" />
+
+<!--
+Nous disposons d'un menu, d'un header, d'une structure de page donc et configurable
+-->
+
+---
+layout: section
 level: 2
 ---
 
-# 3. TwigHooks
+# 4. TwigHooks
 
-Au lieu des template event
+Au lieu des template events
 
 <!--
 Pas très mature
@@ -220,6 +302,42 @@ hideInToc: true
 {{ sylius_template_event([event_prefix, 'sylius.admin.create'], _context) }}
 ```
 
+```yaml
+# config/packages/sylius_ui.yaml
+sylius_ui:
+    events:
+        sylius.shop.layout.after_header:
+            blocks:
+                my_block_name: 'block.html.twig'
+# remplacement
+        sylius.shop.layout.header.grid:
+          blocks:
+            logo: 'logo.html.twig'
+```
+
+<!--
+Pour customiser, il est vous est demandé de vous reporter au ThemeBundle qui s'occupe normalement au sein de Sylius
+de gérer les templates events.
+-->
+---
+layout: center
+hideInToc: true
+---
+
+# Twig hooks
+
+<img src="/hook_workflow.png" alt="Twig hooks" style="
+height: 400px;
+">
+
+<!--
+Hooks inherit their parent names and append their own. 
+
+Thanks to this mechanism, it is not necessary to write the entire composite name in the hook. 
+
+If the hook is fired inside another hookable, the configuration must reflect that. For instance:
+-->
+
 ---
 layout: center
 hideInToc: true
@@ -234,22 +352,6 @@ hideInToc: true
   </div>
 <!-- Additional content -->
 ```
-
-<!--
-Hooks inherit their parent names and append their own. 
-
-Thanks to this mechanism, it is not necessary to write the entire composite name in the hook. 
-
-If the hook is fired inside another hookable, the configuration must reflect that. For instance:
--->
----
-layout: center
-hideInToc: true
----
-
-# Twig hooks
-
-<img height="300px" width="800px" src="/hook_workflow.png" alt="Twig hooks" />
 
 ---
 layout: center
@@ -303,14 +405,104 @@ Motivation & différences
 
 Motivation :
 - pouvoir l'utiliser en dehors de Sylius
+- intégrer Symfony UX et des composants Twig nativement
 
 Différences :
-- va plus loin grâce aux préfixes pour éviter les collisions
-- fonctionne avec les components
 - composant standalone
+- fonctionne avec les components
+- va plus loin grâce aux préfixes pour éviter les collisions
 
 <!--
-standalone donc potentiellement utilisable pour de présents ou futurs frameworks
+standalone donc potentiellement utilisable pour de présents ou futurs frameworks, cms..
+-->
+
+---
+layout: center
+hideInToc: true
+---
+
+# Étendre l'admin avec des Twig hooks
+
+<!--
+-->
+
+---
+layout: center
+hideInToc: true
+---
+
+# Twig hooks & admin
+
+<img src="/sidebar_what_hook.png" alt="Twig hooks" />
+
+<!--
+Voici comment override un hook dans l'admin, on repère quel est le hook concerné et son path
+-->
+
+---
+layout: center
+hideInToc: true
+---
+
+# Twig hooks & admin
+
+```twig
+# templates/bundles/SyliusBootstrapAdminUiBundle/shared/crud/common/sidebar/logo.html.twig
+
+{% set dashboard_path = hookable_metadata.context.routing.dashboard_path|default('/admin') %}
+
+<h1 class="navbar-brand">
+    <a href="{{ dashboard_path }}">
+        Coucou Exotec :)
+    </a>
+</h1>
+```
+
+---
+layout: center
+hideInToc: true
+---
+
+# Twig hooks & admin
+
+<img src="/sidebar_template.png" alt="Twig hooks" />
+
+<!--
+On peut remplacer le lien via templates/bundles/
+-->
+
+---
+layout: center
+hideInToc: true
+---
+
+# Twig hooks & admin
+
+```yml
+# config/packages/sylius_twig_hooks.yaml
+sylius_twig_hooks:
+  hooks:
+    'sylius_admin.common.component.sidebar':
+      logo:
+        template: 'admin/sidebar/logo.html.twig'
+        priority: 0
+```
+
+<!--
+On peut remplacer le lien via templates/bundles/
+-->
+
+---
+layout: center
+hideInToc: true
+---
+
+# Twig hooks & admin
+
+<img src="/sidebar_hook.png" alt="Twig hooks" />
+
+<!--
+On peut remplacer le lien via templates/bundles/
 -->
 
 ---
@@ -334,6 +526,8 @@ Behat-bridge : pouvoir tester facilement le BO
 
 Front : avec des bases du login et des twig hooks pour étendre
 
+Hooks : il pourrait servir de base pour des projets qui proposerait des UI modulables et extensibles
+
 ---
 layout: section
 hideInToc: true
@@ -342,11 +536,11 @@ hideInToc: true
 # Conclusion
 Monofony est mort, vive Monofony ! (et Sylius/Stack)
 
-Peu de docs
+Peu de documentation
 
-TwigHooks sont peu matures
+Les TwigHooks sont peu matures
 
-Points positifs pour l'écosystème Symfony
+Sylius rend à l'écosystème Symfony
 
 ---
 layout: end
