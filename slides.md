@@ -135,11 +135,11 @@ level: 2
 https://nahan.fr/utilisation-de-gridbundle-hors-de-sylius
 
 <!--
-La Grid et le Resource permettent respectivement de créer une grille générique (de type crud admin ou bien front), filtrer, paginer...
+Le Grid bundle permet de créer une grille générique (de type crud admin ou bien front), filtrer, paginer tandis que
 
-La Grid est totalement autonome et permet de gérer tout type de source de données, aussi bien via Doctrine que des fichiers CSV par exemple.
+est totalement autonome et permet de gérer tout type de source de données, aussi bien via Doctrine que des fichiers CSV par exemple.
 
-La Resource est autonome aussi mais est complexe à prendre en main sans la Grid. La ressource créer des controleurs agnostique comme fondation à votre site.
+Le Resource est aussi autonome. Le ressource permet de  créer des controleurs agnostique comme fondation à votre site.
 -->
 
 ---
@@ -209,6 +209,13 @@ layout: section
 level: 2
 ---
 
+<img src="/ui_test.png">
+
+---
+layout: section
+level: 2
+---
+
 # 3. Admin/BootstrapAdmin
 
 <!--
@@ -255,8 +262,6 @@ hideInToc: true
 
 <!--
 Bootstrap admin est en fait un "thème" de l'admin qui configure les templates, blocks etc..
-
-A noter que le login ici ne fait rien, il n'existe que comme base pour construire votre login.
 -->
 
 ---
